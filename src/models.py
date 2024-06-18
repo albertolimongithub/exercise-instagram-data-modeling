@@ -7,27 +7,78 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'user'
+    # Here we define columns for the table user
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    nickname = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    first_name = Column(String(250), nullable=False)
+    second_name = Column(String(250))
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+    followeds = relationship('followed', back_populates='post')
+
+class Post(Base):
+    __tablename__ = 'post'
+    # Here we define columns for the table post.
+   
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    post_date = Column(String(250))
+    
+    user = relationship(User)
+    comments = relationship('Comment', back_populates='post')
+
+    def to_dict(self):
+        return {}
+    
+class Comment(Base):
+    __tablename__ = 'comment'
+    # Here we define columns for the table comment
+    
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('post.id'))
+    comment_author = Column(String(250), nullable=False)
+    comment_text = Column(String(250), nullable=False)
+    comment_date = Column(String(250), nullable=False)
+    
+    comment = relationship(Post)
 
     def to_dict(self):
         return {}
 
+class Follower(Base):
+    __tablename__ = 'follower'
+    # Here we define columns for the table follower
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    nickname = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    first_name = Column(String(250), nullable=False)
+    second_name = Column(String(250))
+
+    follower = relationship(User)
+
+    def to_dict(self):
+        return {}
+    
+class Followed(Base):
+
+    __tablename__ = 'followed'
+    # Here we define columns for the table followed
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    nickname = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    first_name = Column(String(250), nullable=False)
+    second_name = Column(String(250))
+
+    
+
+    def to_dict(self):
+        return {}
 ## Draw from SQLAlchemy base
 try:
     result = render_er(Base, 'diagram.png')
